@@ -1,27 +1,26 @@
+# app.py
 import streamlit as st
+from transformers import pipeline
 
-# Fungsi untuk memproses input pengguna
-def proses_input(input_data):
-    # Misalkan ini adalah fungsi sistem cerdas sederhana
-    hasil = input_data.upper()  # Contoh: mengubah teks menjadi huruf besar
-    return hasil
+# Inisialisasi model NLP
+@st.cache(allow_output_mutation=True)
+def load_model():
+    return pipeline('sentiment-analysis', model='j-hartmann/emotion-english-distilroberta-base')
+
+model = load_model()
 
 # Judul aplikasi
-st.title("Aplikasi Proyek Sistem Cerdas")
+st.title("Sistem Pendeteksi Emosi dalam Teks")
 
 # Input teks dari pengguna
-input_data = st.text_input("Masukkan teks untuk diproses:")
+user_input = st.text_area("Masukkan teks yang ingin Anda analisis:", "")
 
-# Tombol untuk memproses data
-if st.button("Proses"):
-    # Memproses input pengguna
-    hasil = proses_input(input_data)
-    # Menampilkan hasil
-    st.write("Hasil pemrosesan:", hasil)
-
-# Info tambahan atau deskripsi aplikasi
-st.write("""
-### Tentang Aplikasi Ini
-Aplikasi ini merupakan contoh sederhana dari Proyek Sistem Cerdas menggunakan Streamlit.
-Anda dapat memasukkan teks, dan aplikasi akan memproses teks tersebut menjadi huruf besar.
-""")
+# Tombol untuk menganalisis
+if st.button("Analisis Emosi"):
+    if user_input:
+        # Melakukan prediksi emosi
+        results = model(user_input)
+        for result in results:
+            st.write(f"Emosi: {result['label']} - Skor: {result['score']:.2f}")
+    else:
+        st.write("Harap masukkan teks terlebih dahulu.")
